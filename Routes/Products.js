@@ -10,13 +10,6 @@ const path = require("path");
          return cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
      }
  })
-//  const fileFilter = (req, file, cb) => {
-//     if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-//       cb(null, true);
-//     } else {
-//       cb(null, false);
-//     }
-//   };
 const upload = multer({
     storage: storage,
     limits: {fileSize: 10000000}
@@ -41,24 +34,35 @@ router.post("/post-product",upload.single('img_url'),async (req,res)=>{
 router.get("/get-product",async(req,res)=>{
     // const product=await Products.find({});
     // res.send(product);
-    const category = req.query.category ? { category: req.query.category } : {};
-    const searchKeyword = req.query.searchKeyword
-      ? {
-          name: {
-            $regex: req.query.searchKeyword,
-            $options: 'i',
-          },
-        }
-      : {};
-    const sortOrder = req.query.sortOrder
-      ? req.query.sortOrder === 'lowest'
-        ? { price: 1 }
-        : { price: -1 }
-      : { _id: -1 };
-    const product = await Products.find({ ...category, ...searchKeyword }).sort(
+    try{
+       const { page = 1 ,limit = 9 } = req.query;
+       const category = req.query.category ? { category: req.query.category } : {};
+       const brand = req.query.brand ? { brand: req.query.brand } : {};
+       const searchKeyword = req.query.name
+              ? {
+                  name: {
+                    $regex: req.query.name,
+                    $options: '$i',
+                  },
+                }
+              : {};
+        const sortOrder = req.query.price
+              ? req.query.price === 'lowest'
+                ? { price: 1 }
+                : { price: -1 }
+              : { _id: -1 };
+
+    const product = await Products.find({ ...category, ...searchKeyword, ...brand }).limit(limit * 1).skip((page - 1) * limit).sort(
       sortOrder
     );
     res.send(product);
+    } catch (e) {
+      res.status(500).json({ message: "error" })
+    }
+})
+router.get("/get-product/:id",async(req,res)=>{
+  const product = await Products.findById(req.params.id);
+  res.send(product);
 
 })
 router.delete("/delete-product/:id",async(req,res)=>{
@@ -66,8 +70,8 @@ router.delete("/delete-product/:id",async(req,res)=>{
     res.send(deleteProduct)
 })
 router.put("/update-product/:id",upload.single('img_url'), async(req,res)=>{
-    const productId = req.params.id;
-    const product = await Products.findById(productId);
+
+    const product = await Products.findById(req.params.id);
     if (product) {
       product.name = req.body.name;
       product.price = req.body.price;
@@ -80,7 +84,7 @@ router.put("/update-product/:id",upload.single('img_url'), async(req,res)=>{
       if (updatedProduct) {
         return res
           .status(200)
-          .send({ message: 'Product Updated', data: updatedProduct });
+          .send({ message: 'SuccessUpdated', data: updatedProduct });
       }
     }
     return res.status(500).send({ message: ' Error in Updating Product.' });

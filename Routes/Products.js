@@ -27,6 +27,7 @@ router.post("/post-product",upload.single('img_url'),async (req,res)=>{
     try {
         const saveProducts=await product.save();
         res.status(200).send(saveProducts)
+        
     } catch (error) {
         res.status(400).send(error)
     }

@@ -15,6 +15,7 @@ const upload = multer({
     limits: {fileSize: 10000000}
 })
 router.post("/post-product",upload.single('img_url'),async (req,res)=>{
+  console.log(req.file);
     const product=new Products({
         name:req.body.name,
         category:req.body.category,
@@ -22,7 +23,7 @@ router.post("/post-product",upload.single('img_url'),async (req,res)=>{
         description:req.body.description,
         brand:req.body.brand,
         rate:req.body.rate,
-        img_url: `http://localhost:8080/api/product/${req.file.filename}`
+        img_url: req.file.filename
     });
     try {
         const saveProducts=await product.save();
@@ -79,7 +80,7 @@ router.put("/update-product/:id",upload.single('img_url'), async(req,res)=>{
       product.brand = req.body.brand;
       product.category = req.body.category;
       product.description = req.body.description;
-      product.img_url = `http://localhost:8080/api/product/${req.file.filename}`;
+      product.img_url = req.file.filename;
       const updatedProduct = await product.save();
       if (updatedProduct) {
         return res

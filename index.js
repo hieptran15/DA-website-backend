@@ -22,7 +22,7 @@ app.use(express.json())
 
 //route middleware
 app.use("/api/user",authRoute)
-app.use("/api/product",productRoute, express.static('upload/images'))
+app.use("/api/product",express.static('upload/images'),productRoute)
 app.use("/api/category",category)
 app.use("/api/order",order)
 

@@ -55,7 +55,6 @@ router.post("/singIn",async (req,res)=>{
              name:singInUser.name,
              email:singInUser.email,
              password:singInUser.password,
-             isAdmin:singInUser.isAdmin,
              role:singInUser.role,
              token:token
          });

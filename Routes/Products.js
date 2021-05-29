@@ -14,7 +14,7 @@ const upload = multer({
     storage: storage,
     limits: {fileSize: 10000000}
 })
-router.post("/post-product",upload.single('img_url'),async (req,res)=>{
+router.post("/post-product",async (req,res)=>{
   console.log(req.file);
     const product=new Products({
         name:req.body.name,
@@ -23,11 +23,12 @@ router.post("/post-product",upload.single('img_url'),async (req,res)=>{
         description:req.body.description,
         brand:req.body.brand,
         rate:req.body.rate,
-        img_url: req.file.filename
+        img_url: req.body.img_url
     });
     try {
         const saveProducts=await product.save();
         res.status(200).send(saveProducts)
+        
     } catch (error) {
         res.status(400).send(error)
     }
@@ -70,7 +71,7 @@ router.delete("/delete-product/:id",async(req,res)=>{
     const deleteProduct= await Products.findByIdAndDelete(req.params.id)
     res.send(deleteProduct)
 })
-router.put("/update-product/:id",upload.single('img_url'), async(req,res)=>{
+router.put("/update-product/:id", async(req,res)=>{
 
     const product = await Products.findById(req.params.id);
     if (product) {
@@ -80,7 +81,7 @@ router.put("/update-product/:id",upload.single('img_url'), async(req,res)=>{
       product.brand = req.body.brand;
       product.category = req.body.category;
       product.description = req.body.description;
-      product.img_url = req.file.filename;
+      product.img_url = req.body.img_url;
       const updatedProduct = await product.save();
       if (updatedProduct) {
         return res

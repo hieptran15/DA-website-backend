@@ -1,6 +1,6 @@
 const multer = require("multer");
-const express=require("express");
-const router =require("express").Router();
+const express = require("express");
+const router = require("express").Router();
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {

@@ -1,19 +1,10 @@
 const router = require("express").Router();
 const Products = require("../model/Products");
-const multer = require("multer");
+const expressAsyncHandler = require("express-async-handler")
 const path = require("path");
+const { count } = require("console");
 
 //storage engine
-const storage = multer.diskStorage({
-  destination: './upload/images',
-  filename: (req, file, cb) => {
-    return cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
-  }
-})
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 10000000 }
-})
 router.post("/post-product", async (req, res) => {
   const product = new Products({
     name: req.body.name,
@@ -32,13 +23,26 @@ router.post("/post-product", async (req, res) => {
     res.status(400).send(error)
   }
 });
-router.get("/get-product", async (req, res) => {
+router.get("/list-all-product", async (req, res) => {
+  try {
+      const product = await Products.find({});
+      res.status(200).send(product);
+  } catch (error) {
+      res.status(400).send(error)
+  }
+})
+router.get("/get-product", expressAsyncHandler(async (req, res) => {
   // const product=await Products.find({});
   // res.send(product);
   try {
-    const { page = 1, limit = 9 } = req.query;
+    const {limits = 6} = req.query;
+    const page = req.query.page;
+
     const category = req.query.category ? { category: req.query.category } : {};
-    const brand = req.query.brand ? { brand: req.query.brand } : {};
+    const brand = req.query.brand ? { brand: req.query.brand } : {}; 
+    const min = req.query.min && Number(req.query.min) !== 0 ? Number(req.query.min) : 0;
+    const max = req.query.max && Number(req.query.max) !== 0 ? Number(req.query.max) : 0;
+    const priceFilter = min && max ? { price: { $gte: min, $lte: max } } : {};
     const searchKeyword = req.query.name
       ? {
         name: {
@@ -52,15 +56,15 @@ router.get("/get-product", async (req, res) => {
         ? { price: 1 }
         : { price: -1 }
       : { _id: -1 };
-
-    const product = await Products.find({ ...category, ...searchKeyword, ...brand }).limit(limit * 1).skip((page - 1) * limit).sort(
-      sortOrder
-    );
-    res.send(product);
+    const productCount = await Products.find({ ...category, ...searchKeyword, ...brand, ...priceFilter }).count();
+    const product = await Products.find({ ...category, ...searchKeyword, ...brand, ...priceFilter }).sort(sortOrder).skip((page - 1) * limits).limit(limits * 1);
+    res.send({datas:product, count: productCount});
   } catch (e) {
     res.status(500).json({ message: "error" })
   }
 })
+);
+
 router.get("/get-product/:id", async (req, res) => {
   const product = await Products.findById(req.params.id);
   res.send(product);

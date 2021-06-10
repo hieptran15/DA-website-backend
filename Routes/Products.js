@@ -43,10 +43,10 @@ router.get("/get-product", expressAsyncHandler(async (req, res) => {
     const min = req.query.min && Number(req.query.min) !== 0 ? Number(req.query.min) : 0;
     const max = req.query.max && Number(req.query.max) !== 0 ? Number(req.query.max) : 0;
     const priceFilter = min && max ? { price: { $gte: min, $lte: max } } : {};
-    const searchKeyword = req.query.name
+    const searchKeyword = req.query.searchKeyword
       ? {
         name: {
-          $regex: req.query.name,
+          $regex: req.query.searchKeyword,
           $options: '$i',
         },
       }
@@ -56,9 +56,9 @@ router.get("/get-product", expressAsyncHandler(async (req, res) => {
         ? { price: 1 }
         : { price: -1 }
       : { _id: -1 };
-    const productCount = await Products.find({ ...category, ...searchKeyword, ...brand, ...priceFilter }).count();
+    const productCount = await Products.count({ ...category, ...searchKeyword, ...brand, ...priceFilter });
     const product = await Products.find({ ...category, ...searchKeyword, ...brand, ...priceFilter }).sort(sortOrder).skip((page - 1) * limits).limit(limits * 1);
-    res.send({datas:product, count: productCount});
+    res.send({datas:product, count: productCount,  pages: Math.ceil(productCount / limits)});
   } catch (e) {
     res.status(500).json({ message: "error" })
   }

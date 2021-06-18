@@ -8,6 +8,7 @@ const authRoute = require("./Routes/auth");
 const productRoute = require("./Routes/Products");
 const category = require("./Routes/category");
 const order = require("./Routes/order");
+const brands = require("./Routes/brand");
 const UploadFile = require('./Routes/UploadFile');
 dotenv.config()
 app.use(cors())
@@ -26,5 +27,6 @@ app.use('/upload', express.static('upload'))
 app.use("/api/product", productRoute)
 app.use("/api/category", category)
 app.use("/api/order", order)
+app.use("/api/brand", brands)
 app.use('/api/uploads', UploadFile);
 app.listen(8080, () => console.log("server up and running"));

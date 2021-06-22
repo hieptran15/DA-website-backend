@@ -65,6 +65,30 @@ router.get("/get-product", expressAsyncHandler(async (req, res) => {
 })
 );
 
+router.post('/:id/reviews', async (req, res) => {
+  const product = await Products.findById(req.params.id);
+  if (product) {
+    const review = {
+      name: req.body.name,
+      email: req.body.email,
+      rating: Number(req.body.rating),
+      comment: req.body.comment,
+    };
+    product.reviews.push(review);
+    product.numReviews = product.reviews.length;
+    product.rate =
+      product.reviews.reduce((a, c) => c.rating + a, 0) /
+      product.reviews.length;
+    const updatedProduct = await product.save();
+    res.status(201).send({
+      data: updatedProduct.reviews[updatedProduct.reviews.length - 1],
+      message: 'Review saved successfully.',
+    });
+  } else {
+    res.status(404).send({ message: 'Product Not Found' });
+  }
+});
+
 router.get("/get-product/:id", async (req, res) => {
   const product = await Products.findById(req.params.id);
   res.send(product);

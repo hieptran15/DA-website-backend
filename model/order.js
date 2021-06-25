@@ -11,6 +11,11 @@ const useSchema = new mongoose.Schema({
     city: { type: String, required: true, min: 1, max: 255 },
     noteOrder: { type: String, required: true },
     total: { type: Number, required: true },
+    status: { type: String, required: true, min: 1, max: 255 },
     cartItems: { type: Array, required: true },
-})
+},
+    {
+        timestamps: true,
+    }
+)
 module.exports = mongoose.model("order", useSchema)

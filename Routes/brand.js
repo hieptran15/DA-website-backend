@@ -25,8 +25,8 @@ router.get("/get-all-brand", async (req, res) => {
 router.put("/update-brand/:id", async (req, res) => {
     const brands = await Brands.findById(req.params.id);
     if (brands) {
-        brands.Brands = req.body.brand;
-        const updatedBrand = await Brands.save();
+        brands.brand = req.body.brand;
+        const updatedBrand = await brands.save();
         if (updatedBrand) {
             return res
                 .status(200)
@@ -36,7 +36,7 @@ router.put("/update-brand/:id", async (req, res) => {
     return res.status(500).send({ message: ' Error in Updating brand.' });
 });
 
-router.delete("/delete-brand/id", async (req, res) => {
+router.delete("/delete-brand/:id", async (req, res) => {
     try {
         const brands = await Brands.findByIdAndDelete(req.params.id);
         res.status(200).send(brands);

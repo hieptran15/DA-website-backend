@@ -9,6 +9,7 @@ router.post("/post-order", async (req, res) => {
         phone: req.body.phone,
         portCode: req.body.portCode,
         city: req.body.city,
+        status: req.body.status,
         noteOrder: req.body.noteOrder,
         total: req.body.total,
         cartItems: req.body.cartItems,
@@ -49,4 +50,19 @@ router.delete("/delete-order/:id", async (req, res) => {
         res.status(400).send(error)
     }
 })
+
+router.patch("/update-status/:id", async (req, res) => {
+
+    const orders = await order.findById(req.params.id);
+    if (orders) {
+        orders.status = req.body.status; 
+       const updatedStatus = await orders.save();
+      if (updatedStatus) {
+        return res
+          .status(200)
+          .send({ message: 'SuccessUpdated', data: updatedStatus });
+      }
+    }
+    return res.status(500).send({ message: ' Error in Updating Product.' });
+  })
 module.exports = router;

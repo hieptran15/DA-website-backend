@@ -56,10 +56,10 @@ router.post('/:id/reviews', async (req, res) => {
         comment: req.body.comment,
       };
       blog.reviews.push(review);
-      blog.numReviews = product.reviews.length;
-      const updatedBlog = await product.save();
+      blog.numReviews = blog.reviews.length;
+      const updatedBlog = await blog.save();
       res.status(201).send({
-        data: updatedBlog.reviews[updatedProduct.reviews.length - 1],
+        data: updatedBlog.reviews[updatedBlog.reviews.length - 1],
         message: 'Review saved successfully.',
       });
     } else {

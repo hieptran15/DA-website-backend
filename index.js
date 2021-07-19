@@ -11,6 +11,7 @@ const order = require("./Routes/order");
 const brands = require("./Routes/brand");
 const sendMail = require("./Routes/SendMail");
 const UploadFile = require('./Routes/UploadFile');
+const blog = require('./Routes/Blog');
 dotenv.config()
 app.use(cors())
 //connect mongoose
@@ -29,6 +30,7 @@ app.use("/api/product", productRoute)
 app.use("/api/category", category)
 app.use("/api/order", order)
 app.use("/api/brand", brands)
+app.use("/api/blog", blog)
 app.use("/api/send-mail", sendMail)
 app.use('/api/uploads', UploadFile);
 app.listen(8080, () => console.log("server up and running"));

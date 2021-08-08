@@ -25,7 +25,8 @@ router.post("/post-product", async (req, res) => {
 });
 router.get("/list-all-product", async (req, res) => {
   try {
-      const product = await Products.find({});
+      const category = req.query.category ? { category: req.query.category } : {};
+      const product = await Products.find({...category});
       res.status(200).send(product);
   } catch (error) {
       res.status(400).send(error)
@@ -35,7 +36,7 @@ router.get("/get-product", expressAsyncHandler(async (req, res) => {
   // const product=await Products.find({});
   // res.send(product);
   try {
-    const {limits = 6} = req.query;
+    const {limits = 9} = req.query;
     const page = req.query.page;
 
     const category = req.query.category ? { category: req.query.category } : {};
